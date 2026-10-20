@@ -1,0 +1,35 @@
+version: 2
+
+models:
+  - name: fct_orders
+    description: >
+      Факт заказов: одна строка — один заказ. Тестовые заказы исключены.
+      К заказу пристыкованы итоги по платежам; подтверждённая покупка — статус paid
+      и хотя бы одна успешная оплата (возврат оплатой не считается).
+    columns:
+      - name: order_id
+        description: "Номер заказа."
+        data_tests: [unique, not_null]
+      - name: customer_id
+        description: "Клиент, оформивший заказ."
+      - name: order_date
+        description: "Дата заказа."
+      - name: ordered_at
+        description: "Время оформления заказа."
+      - name: order_status
+        description: "Статус заказа: paid, pending, returned, cancelled."
+      - name: order_amount
+        description: "Сумма заказа в рублях после скидок."
+      - name: paid_amount
+        description: "Сумма успешных оплат без возвратов; 0, если оплат нет."
+      - name: refunded_amount
+        description: "Сумма возвратов положительным числом; 0, если возвратов нет."
+      - name: net_paid_amount
+        description: "Оплачено минус возвращено."
+      - name: successful_payments_count
+        description: "Число успешных оплат без возвратов."
+      - name: first_paid_at
+        description: "Время первой успешной оплаты; пусто, если оплат нет."
+      - name: is_confirmed
+        description: "Подтверждённая покупка: статус paid и хотя бы одна успешная оплата."
+        data_tests: [not_null]

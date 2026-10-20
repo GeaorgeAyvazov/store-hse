@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: int_orders_with_payments
+    description: >
+      Одна строка — один заказ (включая тестовые), к нему пристыкованы итоги по платежам.
+      Платежи сначала свёрнуты до заказа, потом присоединены left join: заказ без платежей не теряется.
+    columns:
+      - name: order_id
+        description: "Номер заказа."
+      - name: successful_payments_count
+        description: "Число успешных оплат без возвратов."
+      - name: paid_amount
+        description: "Сумма успешных оплат без возвратов; 0, если оплат нет."
+      - name: refunded_amount
+        description: "Сумма возвратов положительным числом."
+      - name: net_paid_amount
+        description: "Оплачено минус возвращено."
+      - name: is_confirmed
+        description: "Подтверждённая покупка: статус paid и хотя бы одна успешная оплата."
+      - name: success_operations_count
+        description: "Число операций в статусе success, включая возвраты."
+      - name: failed_operations_count
+        description: "Число неуспешных операций."
+      - name: pending_operations_count
+        description: "Число операций в ожидании."
