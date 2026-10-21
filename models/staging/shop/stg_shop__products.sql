@@ -1,0 +1,6 @@
+select
+    product_id,
+    product_name,
+    brand,
+    category as category_name
+from {{ source('shop', 'products') }}

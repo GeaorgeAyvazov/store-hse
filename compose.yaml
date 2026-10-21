@@ -19,16 +19,47 @@ services:
       timeout: 3s
       retries: 20
 
+  greenplum:
+    image: woblerr/greenplum:7.1.0
+    hostname: greenplum
+    environment:
+      GREENPLUM_DATABASE_NAME: dwh
+      GREENPLUM_PASSWORD: gpadmin
+    ports:
+      - "${GP_PORT:-5440}:5432"
+    volumes:
+      - dbt_shop_gpdata:/data
+      - ./init/greenplum:/docker-entrypoint-initdb.d:ro
+    shm_size: 1gb
+    healthcheck:
+      test: ["CMD-SHELL", "PGPASSWORD=gpadmin /usr/local/greenplum-db/bin/psql -h greenplum -U gpadmin -d dwh -v ON_ERROR_STOP=1 -c 'select 1 from raw.orders limit 1' >/dev/null"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 30s
+
+  loader:
+    build: .
+    image: dbt-shop:1.10
+    entrypoint: ["python", "/project/loader/load_raw.py"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      greenplum:
+        condition: service_healthy
+    volumes:
+      - .:/project
+
   # dbt в контейнере. Запуск: docker compose run --rm dbt <команда>
   dbt:
     build: .
     image: dbt-shop:1.10
     profiles: ["tools"]
     depends_on:
-      postgres:
-        condition: service_healthy
+      loader:
+        condition: service_completed_successfully
     environment:
-      DBT_HOST: postgres
+      DBT_HOST: greenplum
       DBT_PORT: "5432"
       DBT_PROFILES_DIR: /project
       DBT_SEND_ANONYMOUS_USAGE_STATS: "false"
@@ -40,3 +71,4 @@ services:
 
 volumes:
   dbt_shop_pgdata:
+  dbt_shop_gpdata:
