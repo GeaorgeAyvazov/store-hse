@@ -179,6 +179,11 @@ order by c.relname;
 
 ### Граф зависимостей
 
+Общий граф моделей: [обзор lineage](docs/lineage_overview.png).
+Ниже - увеличенный фрагмент для `fct_order_items` и её непосредственных
+зависимостей (`--select 1+fct_order_items`, resources: Models).
+Оба снимка сделаны в `dbt docs serve`.
+
 ![Lineage из dbt docs serve](docs/lineage.png)
 
 ## Тесты
